@@ -4,8 +4,9 @@ import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from "./consts.js";
 import { useAttributesHook } from "./hooks/useAttributesHook";
 
 function App() {
-    const attributesHooks = useAttributesHook();
+    const [attributesHooks, possibleClasses] = useAttributesHook();
     const [selectedClass, setSelectedClass] = useState();
+    const [skillPoints, setSkillPoints] = useState(10);
 
     return (
         <div className="App">
@@ -36,6 +37,9 @@ function App() {
                             onClick={() => {
                                 setSelectedClass(characterClass);
                             }}
+                            className={
+                                possibleClasses[characterClass] ? "red" : ""
+                            }
                         >
                             {characterClass}
                         </div>
@@ -45,13 +49,22 @@ function App() {
                     <div className="container">
                         <h1>{selectedClass} Minimum Requirements</h1>
                         {ATTRIBUTE_LIST.map((attribute) => (
-                            <div>
+                            <div key={attribute}>
                                 {attribute}:{" "}
                                 {CLASS_LIST[selectedClass][attribute]}
                             </div>
                         ))}
                     </div>
                 )}
+                <div className="container">
+                    <h1>Skills</h1>
+                    <h4>Total skill points available: {skillPoints}</h4>
+                    {SKILL_LIST.map(({ name, attributeModifier }) => (
+                        <div key={name}>
+                            {name}: 0 (Modifier: {attributeModifier})
+                        </div>
+                    ))}
+                </div>
             </section>
         </div>
     );
