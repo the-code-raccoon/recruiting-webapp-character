@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ATTRIBUTE_LIST, CLASS_LIST } from "../consts";
+import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from "../consts";
 
 export const useAttributesHook = () => {
     // const [attributesState, setAttributesState] = useState({
@@ -49,6 +49,57 @@ export const useAttributesHook = () => {
     //     Charisma: charisma,
     // };
 
+    const [availableSkillPoints, setAvailableSkillPoints] = useState(10);
+    const [skillPoints, setSkillPoints] = useState({});
+
+    useEffect(() => {
+        const temp = {};
+        for (const skill of SKILL_LIST) {
+            temp[skill.name] = {
+                value: 0,
+                atttributeModifier: skill.attributeModifier,
+                modifierValue: 0,
+            };
+        }
+        setSkillPoints(temp);
+    }, []);
+
+    const plusSkillPoints = (skillName) => {
+        if (availableSkillPoints === 0) {
+            return;
+        } else {
+            setAvailableSkillPoints(availableSkillPoints - 1);
+        }
+        const value = skillPoints[skillName].value;
+
+        setSkillPoints((prev) => {
+            return {
+                ...prev,
+                [skillName]: { ...prev[skillName], value: value + 1 },
+            };
+        });
+    };
+
+    const minusSkillPoints = (skillName) => {
+        const value = skillPoints[skillName].value;
+        if (value === 0) {
+            return;
+        } else {
+            setAvailableSkillPoints(availableSkillPoints + 1);
+        }
+
+        setSkillPoints((prev) => {
+            return {
+                ...prev,
+                [skillName]: { ...prev[skillName], value: value - 1 },
+            };
+        });
+    };
+
+    useEffect(() => {
+        setAvailableSkillPoints(availableSkillPoints + modifier(intelligence) * 4);
+    }, [intelligence]);
+
     useEffect(() => {
         for (const characterClass in CLASS_LIST) {
             if (Object.hasOwnProperty.call(CLASS_LIST, characterClass)) {
@@ -78,11 +129,11 @@ export const useAttributesHook = () => {
 
                 if (checkMinRequirements(classAttributes)) {
                     setPossibleClasses((prev) => {
-                        return { ...prev, [characterClass]: true }
+                        return { ...prev, [characterClass]: true };
                     });
                 } else {
                     setPossibleClasses((prev) => {
-                        return { ...prev, [characterClass]: false }
+                        return { ...prev, [characterClass]: false };
                     });
                 }
             }
@@ -131,8 +182,8 @@ export const useAttributesHook = () => {
     //     };
     // });
 
-    return [
-        {
+    return {
+        myAttributes: {
             Strength: {
                 state: strength,
                 plus: () => plus(strength, setStrength),
@@ -171,5 +222,9 @@ export const useAttributesHook = () => {
             },
         },
         possibleClasses,
-    ];
+        availableSkillPoints,
+        skillPoints,
+        plusSkillPoints,
+        minusSkillPoints,
+    };
 };

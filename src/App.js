@@ -4,9 +4,15 @@ import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from "./consts.js";
 import { useAttributesHook } from "./hooks/useAttributesHook";
 
 function App() {
-    const [attributesHooks, possibleClasses] = useAttributesHook();
+    const {
+        myAttributes,
+        possibleClasses,
+        availableSkillPoints,
+        skillPoints,
+        plusSkillPoints,
+        minusSkillPoints,
+    } = useAttributesHook();
     const [selectedClass, setSelectedClass] = useState();
-    const [skillPoints, setSkillPoints] = useState(10);
 
     return (
         <div className="App">
@@ -18,12 +24,12 @@ function App() {
                     <h1>Attributes</h1>
                     {ATTRIBUTE_LIST.map((attribute) => (
                         <div key={attribute}>
-                            {attribute}: {attributesHooks[attribute].state}{" "}
-                            (Modifier: {attributesHooks[attribute].modifier})
-                            <button onClick={attributesHooks[attribute].plus}>
+                            {attribute}: {myAttributes[attribute].state}{" "}
+                            (Modifier: {myAttributes[attribute].modifier})
+                            <button onClick={myAttributes[attribute].plus}>
                                 +
                             </button>
-                            <button onClick={attributesHooks[attribute].minus}>
+                            <button onClick={myAttributes[attribute].minus}>
                                 -
                             </button>
                         </div>
@@ -58,12 +64,26 @@ function App() {
                 )}
                 <div className="container">
                     <h1>Skills</h1>
-                    <h4>Total skill points available: {skillPoints}</h4>
-                    {SKILL_LIST.map(({ name, attributeModifier }) => (
-                        <div key={name}>
-                            {name}: 0 (Modifier: {attributeModifier})
-                        </div>
-                    ))}
+                    <h4>
+                        Total skill points available: {availableSkillPoints}
+                    </h4>
+                    {SKILL_LIST.map(({ name, attributeModifier }) => {
+                        if (!skillPoints[name]) {
+                            return <></>;
+                        }
+                        return (
+                            <div key={name}>
+                                {name}: {skillPoints[name].value} (Modifier:{" "}
+                                {attributeModifier})
+                                <button onClick={() => plusSkillPoints(name)}>
+                                    +
+                                </button>
+                                <button onClick={() => minusSkillPoints(name)}>
+                                    -
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
             </section>
         </div>
